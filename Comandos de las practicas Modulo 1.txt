@@ -1,0 +1,73 @@
+Comandos de las practicas.
+
+Practica 1: Configuración de parámetros de redes.
+sudo su
+ifconfig
+sudo ifconfig ens33 192.168.56.1
+sudo ifconfig ens33 0.0.0.0
+sudo nano /etc/netplan/01-network-manager-all.yaml
+----
+network:
+versión:2
+ens33:
+dhcp4:
+addresses:
+192.168.233.200/24
+nameservers:
+addresses: [8.8.8.8, 8.8.4.4]
+routes:{
+-to: default
+via: 192.168.56.1
+sudo chmod 600 /etc/netplan/01-network-manager-all.yaml
+netplan try
+sudo netplan apply
+
+
+sudo nano /etc/netplan/99_config,yaml
+------
+network:
+versión:2
+ens33:
+dhcp4:true
+sudo chmod 600 /etc/netplan/99_config,yaml
+sudo netplan apply
+
+sudo nano /etc/resolv.conf
+nameservers:8.8.8.8
+nameservers: 8.8.4.4
+
+cat /etc/resolv.conf
+
+Practica 2:Gestión de usuarios y grupos
+sudo su
+sudo adduser manito
+sudo usermod -aG sudo manito
+getent group sudo
+sudo addgroup guest
+sudo adduser manita
+sudo usermod -aG guest manita
+sudo deluser manita
+sudo delgroup guest
+sudo deluser manito
+
+Practica 3: Gestion de Permisos de archivos:
+sudo su
+cd Desktop
+ls
+mkdir Materia
+cd Materia
+touch estudiante.txt
+vi estudiante.txt (escribir nombre y matricula dentro)
+:qw
+cat estudiante.txt
+sudo chmod 700 estudiante.txt
+sudo chmod 070 estudiante.txt
+cd Desktop
+mkdir Materia2
+sudo cp Materia/estudiante.txt Materia2
+cd Materia2
+ls
+sudo rm -r Materia
+
+
+
