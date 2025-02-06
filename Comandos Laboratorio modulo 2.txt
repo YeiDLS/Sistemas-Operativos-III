@@ -1,0 +1,35 @@
+Comandos: Laboratorio modulo 2
+
+Practica 1:
+sudo apt update
+sudo apt upgrade
+grep ^deb /etc/apt/sources.list
+cd /etc/apt
+nano sources.list
+cd sources.list.d
+nano Ubuntu.sources
+apt-cache search bashtop
+snap install bashtop
+sudo apt install bashtop
+bashtop
+sudo apt purge bashtop
+sudo apt autoremove
+
+----------------------------------------------------------------------------------------------------------------------------------------
+Practica 2:
+sudo
+crontab -e
+
+(crontab)
+primero
+m  h  dom  mon dow
+0  23  *    *   *   update && apt update -y
+0  3   *    *   7   Reboot
+
+sudo crontab-l
+sudp "rm -rf /tmp/*" | at now +1 minute
+atq
+cd /tmp
+ls
+
+
