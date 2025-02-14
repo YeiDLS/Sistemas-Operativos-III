@@ -1,0 +1,74 @@
+Comandos laboratorio 3
+
+Practica 1
+sudo su
+cd /etc
+cd /default
+nano grub
+GRUB_TIMEOUT: 0 cambiado a 20
+sudo update-grub
+sudo reboot
+(Reiniciar VM y entrar al modo seguro)
+(Entrar al root)
+mount
+passwd (usuario)
+(contraseña nueva 2 veces)
+reboot
+
+---------------------------------------------------------------------------------------------
+Practica 2
+
+(Script 1)
+sudo nano script2.sh
+
+#!/bin/bash
+
+ORIGEN="/home/yeinel/"
+FECHA=$(date +"%d-%m-%Y:%H:%M")
+copia_yeinel="backup-$FECHA.tar.gz"
+tar -czvf "$copia_yeinel" "$ORIGEN"
+echo "Copia realizada exitosamente: $copia_yeinel"
+
+(Guardar y salir)
+sudo cdmod +x script2.sh
+./script2.sh (Para ejecutar)
+
+(Script 2)
+sudo nano script4.sh
+
+#!/bin/bash
+
+echo "Introduce el nombre del archivo"
+read NOMBRE_ARCHIVO
+RUTA_ARCHIVO="/home/yeinel/Desktop/$NOMBRE_ARCHIVO.txt"
+ifconfig > "$RUTA_ARCHIVO"
+echo "El resultado de ifconfig ha sido guardado en: $RUTA_ARCHIVO"
+
+(Guardar y salir)
+sudo chmod +x scrip4.sh
+./scrip4.sh (Para ejecutar)
+
+
+---------------------------------------------------------------------------------------------
+Practica 3
+
+ifconfig
+ping 172.20.10.10
+sudo apt install openssh-server 
+sudo systemctl status ssh
+sudo systemctl enable ssh
+ssh yeinel@172.20.10.10
+mkdir -p ~/.ssh
+cd -/.ssh
+touch authorized_keys
+chmod 600 authorized_keys
+cd ~/.ssh
+sudo nano authorized_keys
+
+
+
+
+
+
+
+
