@@ -1,0 +1,119 @@
+Practica 1:
+Parte 1
+sudo apt install apache2 -y
+cd /var/www/HTML
+sudo nano index.html
+sudo mkdir holamundo.com
+cd holamundo.com
+sudo nano index.html
+
+DENTRO DE INDEX.HTML
+<!DOCTYP html>
+<html>
+<head>
+<title>Hola Mundo</title>
+</head>
+<body>
+Hola Mundo
+</body>
+</html>
+
+cd
+cd /etc/apache2/sites-available
+ls 
+sudo cp 000-default.conf holamundo.conf
+sudo nano holamundo.conf
+(poner /var/www/html/holamundo.conf/
+
+sudo a2ensite holamundo.conf
+sudo a2dissite 000-default.conf
+sudo systemctl reload apache2
+
+Parte 2
+cd /var/www/html
+sudo mkdir mimatricula.com
+cd mimatricula.com
+sudo nano index.html
+
+DENTRO DE ESTE INDEX.HTML
+
+<!DOCTYP html>
+<html>
+<head>
+<title>Nombre y Matricula</title>
+<body>
+<p>Yeinel De Los Santos Pimentel</p>
+<p>2024-1204</p>
+<p>Sistemas Operativos 3</p>
+</body>
+</html>
+
+cd /etc/apache2/sites-available
+sudo cp holamundo.conf mimatricula.conf
+sudo nano mimatricula.conf
+cd ..
+sudo nano ports.conf
+sudo a2ensite mimatricula.conf
+sudo systemctl reload apache2
+
+Practica 2:
+sudo apt install postfix -y
+sudo dpkg-reconfigure postfix
+sudo systemctl reload postfix
+sudo systemctl restart postfix
+sudo apt install mailutils -y
+sudo nano /etc/postfix/sasl/sasl_passwd
+[smtp.gmail.com]:587 (mi correo) (llave de aplicacion)
+sudo chmod 600 /etc/postfix/sasl/sasl_passwd
+sudo chmod 600 /etc/postfix/sasl/sasl_passwd.db
+sudo nano /etc/postfix/main.cf
+
+DENTRO DE MAIN CF
+[smtp.gmail.com]587
+smtp_sasl_auth_enable = yes
+smtp_sasl_security_options = noanonymous
+smtp_sasl_password_maps = hash:/etc/postfix/sasl/sasl_passwd
+smtp_tls_security_level = encrypt
+smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+
+sudo systemctl restart postfix
+sudo systemctl enable postfix
+sudo systemctl start postfix
+sudo systemctl status postfix
+echo "Yeinel 2024 1204" | mail -s "MambruSeFueALaGuerra" os3conadrian@gmail.com
+
+Practica 3:
+sudo apt install cups
+sudo apt install cups-pdf
+sudo systemctl status cups
+cupsctl --remote-admin --remote-any --share-printers
+sudo ufw allow 631/tcp
+sudo systemctl restart ufw
+sudo useradd -g Lpadmin admincups
+sudo passwd admincups
+ifconfig
+(Copiar IP)
+(Usar IP para acceder a cups con el puerto 631)
+(Poner Usuario)
+(Poner Impresora y su tipo)
+(Agregar la impresora)
+(Imprimir paginas de Prueba)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
