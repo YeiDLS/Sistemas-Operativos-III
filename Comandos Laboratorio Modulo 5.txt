@@ -1,0 +1,173 @@
+Comandos Laboratorio Modulo 5
+Practica 1
+ifconfig
+ssh yeinel@192.168.233.131
+cd Desktop
+mkdir practica
+ls
+cd practica 
+touch testing {1..100}.txt
+ls
+rsync -avz /home/Yeinel/Desktop/practica yeinel@192.168.233.133:/home/yeinel/Desktop
+sudo nano resync.sh
+(Copiamos dentro nuevamente: rsync -avz /home/Yeinel/Desktop/practica yeinel@192.168.233.133:/home/yeinel/Desktop)
+sudo chmod +x resync.sh
+crontab -e
+* * * * * /bin/bash /home/yeinel/Desktop/resync.sh
+cd Desktop/practica
+ls
+touch Nombremuylargoquepuedaserreconocible.txt
+Aquí termina la practica, errores corregidos dentro del video y la actulizacion de la sincronización ya esta hecha
+
+
+
+Practica 2
+
+2. Instalar Pacemaker y Corosync
+Ejecutar en ambos nodos:
+
+
+Copiar
+Editar
+sudo apt update
+sudo apt install -y pacemaker corosync crmsh
+Verifica la instalación:
+
+
+Copiar
+Editar
+systemctl status pacemaker corosync
+3. Configurar Corosync
+Edita /etc/corosync/corosync.conf en ambos nodos:
+
+
+Copiar
+Editar
+sudo nano /etc/corosync/corosync.conf
+Ejemplo de configuración:
+
+ini
+Copiar
+Editar
+totem {
+    version: 2
+    cluster_name: ha_cluster
+    transport: udpu
+}
+
+nodelist {
+    node {
+        ring0_addr: IP1  # Nodo1
+        name: nodo1
+        nodeid: 1
+    }
+    node {
+        ring0_addr: IP2  # Nodo2
+        name: nodo2
+        nodeid: 2
+    }
+}
+
+quorum {
+    provider: corosync_votequorum
+    two_node: 1
+}
+
+logging {
+    to_syslog: yes
+}
+Aplica la configuración en ambos nodos:
+
+
+Copiar
+Editar
+sudo systemctl restart corosync
+sudo systemctl enable corosync
+Verifica el estado:
+
+Copiar
+Editar
+sudo corosync-cmapctl | grep members
+4. Iniciar y Configurar Pacemaker
+En ambos nodos:
+
+Copiar
+Editar
+sudo systemctl start pacemaker
+sudo systemctl enable pacemaker
+Verifica el estado:
+
+Copiar
+Editar
+sudo crm_mon -1
+5. Configurar la IP Flotante
+En el nodo principal, configura una IP flotante en el clúster:
+
+
+Copiar
+Editar
+sudo crm configure property stonith-enabled=false
+sudo crm configure primitive vip ocf:heartbeat:IPaddr2 \
+   params ip=192.168.1.200 cidr_netmask=24 \
+   op monitor interval=30s
+Verifica la configuración:
+
+Copiar
+Editar
+sudo crm configure show
+6. Pruebas de Alta Disponibilidad
+Haz ping desde un equipo externo:
+
+
+
+
+Practica 3
+cd Desktop
+cd /var/www/HTML
+cd holamundo.com
+sudo nano index.html
+Cambiamos el titulo y el cuerpo Para indicar servidor 1
+Repetimos lo mismo en la segunda maquina y hacemos que indique que es el servidor 2
+sudo apt install keepalived -y en ambas maquinas
+sudo nano /etc/keepalived/keepalived.conf en ambas maquinas
+
+Primera maquina:
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens33
+    virtual_router_id 51
+    priority 100  
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass Lakbra2730
+    }
+    virtual_ipaddress {
+        10.0.0.237 
+    }
+}
+
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens33
+    virtual_router_id 51
+    priority 100  
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass Lakbra2730
+    }
+    virtual_ipaddress {
+        10.0.0.237 
+    }
+}
+
+sudo systemctl restart keepalived
+sudo systemctl enable keepalived
+sudo systemctl start keepalived
+sudo systemctl status keepalived
+EN AMBAS MAQUINAS
+Ip a para revisar las ip al momento de poner a prueba 
+sudo reboot para probar cuando vayamos a reiniciar en server 1 y server 2
+
