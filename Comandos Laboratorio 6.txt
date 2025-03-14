@@ -1,0 +1,143 @@
+Comandos Laboratorio 6
+
+Practica 1
+
+sudo apt install gnupg2 -y
+sudo apt update
+cd Desktop
+mkdir gpt
+cd gpt
+touch chat.txt
+sudo nano chat.txt
+ls
+cat chat.txt
+sudo gpg2 --symmetric chat.txt
+clave: goku
+ls
+cat chat.txt
+sudo gpg2 --decrypt chat.txt.gpg
+ls
+sudo cat chat.txt.gpg
+sudo gpg2 --output chat.txt.gpg --decrypt chat.txt.gpg
+ls
+sudo cat chat.txt.gpg
+
+Practica 2
+
+
+sudo systemctl enable apache2
+sudo systemctl enable ssh
+sudo systemctl enable vsftpd
+sudo systemctl start apache2
+sudo systemctl start ssh
+sudo systemctl start vsftpd
+
+ifconfig
+(Buscar ip en apache para comprobar)
+ssh yeinel@10.0.0.215
+
+IPTABLES
+
+sudo apt install iptables -y
+sudo iptables -L --line-numbers
+
+Bloquear y acceptar
+
+sudo iptables -A INPUT -p tcp --dport 80 -j DROP
+
+sudo iptables -A INPUT -p tcp --dport 21 -j DROP
+
+sudo iptables -A INPUT -p tcp --dport 22 -j DROP
+
+Sudo iptables -L --line-numbers
+
+
+sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+
+sudo iptables -A INPUT -p tcp --dport 21 -j ACCEPT
+
+sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+sudo iptables -L --line-numbers
+
+Borrar
+sudo iptables -D INPUT (numero de servicio que vamos a borrar)
+
+UFW
+
+sudo ufw status verbose
+sudo ufw enable
+sudo ufw status verbose
+
+Bloquear
+
+sudo ufw deny 80/tcp
+sudo ufw deny 21/tcp
+sudo ufw deny 22/tcp
+
+sudo ufw status numbered
+
+Permitir
+
+
+sudo ufw allow 80/tcp
+sudo ufw allow 21/tcp
+sudo ufw allow 22/tcp
+
+
+
+Practica 3
+
+sudo apt install snort -y
+
+(configurar ip en el rango de nuestra red)
+
+snort -V
+
+sudo nano /etc/snort/snort.conf
+
+ipvar HOME_NET 192.168.233.0/24
+sudo nano /etc/snort/rules/darules.rule
+
+Detectar ping
+alert icmp any any -> $HOME_NET any (msg:"Ping detectado"; sid:1000001; rev:1;)
+Detectar SSH
+alert tcp any any -> $HOME_NET 22 (msg:"Intento de conexión SSH Detectado"; sid:1000002; rev:1;)
+Detectar FTP
+alert tcp any any -> $HOME_NET 21 (msg:"Intento de conexión FTP detectado"; sid:1000003; rev:1;)
+Detectar HTTP
+alert tcp any any -> $HOME_NET 80 (msg:"Intento de conexión HTTP detectado"; sid:1000004; rev:1;)
+
+sudo nano /etc/snort/snort.conf
+
+include $ROLE_PATH/darules.rule
+sudo snort -A console -q -c /etc/snort/snort.conf -i ens33
+
+Probamos haciendo ping, solicitud SSH, Solicitud FTP y Entrar al server HTTP
+
+Practica 4
+
+sudo apt update && sudo apt install libpam-google-authenticator -y
+
+google-authenticator
+
+Hacemos los pasos dentro del video como conectarnos con los códigos y aceptar lo que necesitamos
+
+sudo nano /etc/pam.d/sshd
+(Al final del documento)
+auth required pam_google_authenticator.so
+
+sudo nano /etc/pam.d/sshd.conf
+
+KbdInteractiveAunthentication yes
+UserPam yes
+
+sudo systemctl restart sshd.service
+
+Realizamos las conexiones ssh y ponemos los códigos en el authenticator
+
+
+
+
+
+
