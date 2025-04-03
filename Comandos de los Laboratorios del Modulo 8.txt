@@ -1,0 +1,93 @@
+Comandos de los Laboratorios del Modulo 8
+
+Practica 1
+
+sudo apt install docker.io -y
+sudo systemctl status Docker
+sudo Docker pull nginx
+sudo Docker images
+sudo mkdir -p sitioweb
+cd sitioweb
+sudo nano index.html
+{dentro el index}
+
+<!DOCTYPE html>
+<html>
+   <head>
+    <title>Hoy si</title>
+   </head>
+  <body>
+   <p>Yeinel DLS</p>
+   <p>20241204</p>
+  </body>
+</html>
+
+sudo Docker run -d -p 8888:80 -v /home/dls20241204/sitioweb:/usr/share/nginx/HTML nginx
+sudo Docker ps -a  
+
+
+Practica 2
+
+sudo systemctl status Docker
+sudo Docker pull portainer/portainer-ce
+sudo Docker ps -a
+sudo Docker run -d -p 8000:8000 -p 9000:9000 --name portainer --restart=always -v /var/run/Docker.sock:/var/run/Docker.sock:/var/run/Docker.sock - portainer_data:/data portainer/portaine-ce
+sudo docker ps -a
+sudo docker start e06 (explico que paso luego en el video)
+(Despues entrar a portainer, conetarse y apagar y prender el servicio nginx)
+
+Practica 3
+
+sudo apt update
+cd Desktop
+sudo apt-get install
+sudo apt-get install ca-certificates curl gnupg lsb-release
+sudo mkdir -p /etc/apt/keyrings 
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+mkdir wordpress
+cd wordpress
+sudo nano docker-compose.yml
+{Dentro del Archivo YAML}
+
+version: '3.1'
+
+services:
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress_data:/var/www/html
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  wordpress_data:
+  db_data:
+
+networks:
+  wordpress_network:
+
+{Acaba el YAML}
+
+sudo docker-compose up -d
+{Configuramos Docker en el navegador y acaba la practica}
+
+
