@@ -1,0 +1,200 @@
+Comandos Laboratorio 9
+
+Practica1
+
+sudo nano /etc/apt/sources.list
+
+A continuación, agregue esta línea en la parte inferior del archivo para agregar el nuevo repositorio:
+
+/etc/apt/sources.list
+. . .
+deb http://download.webmin.com/download/repository sarge contrib
+
+sudo apt update
+wget -q -O- http://www.webmin.com/jcameron-key.asc | sudo apt-key add
+sudo apt update
+sudo apt install webmin
+(Para entrar a webmin se usa tuip:10000)
+
+Practica2
+
+wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update && sudo apt install terraform
+terraform
+sudo mkdir Terradrian
+cd Terradrian
+sudo nano terra.tf
+
+(Copiar dentro)
+terraform {
+  required_providers {
+    digitalocean = {
+      source  = "digitalocean/digitalocean"
+      version = "~> 2.0"
+    }
+  }
+}
+
+# Set the variable value in *.tfvars file
+# or using -var="do_token=..." CLI option
+variable "do_token" {}
+
+# Configure the DigitalOcean Provider
+provider "digitalocean" {
+  token = var.do_token
+}
+
+# Create a web server
+resource "digitalocean_droplet" "web" {
+  # ...
+}
+
+sudo terraform init
+sudo terraform validate
+sudo nano token.txt
+(Copia el token dentro)
+sudo terraform validate
+ssh-keygen
+cat /home/yeinel/.ssh/id_ed25519.pub
+(Copia la llave)
+cd Terradrian
+sudo nano terra.tf
+(Copiar dentro y configurar)
+# Create a new Web Droplet in the nyc2 region
+resource "digitalocean_droplet" "web" {
+  image   = "ubuntu-22-04-x64"
+  name    = "web-1"
+  region  = "nyc1"
+  size    = "s-1vcpu-1gb"
+  ssh_keys = [Fingerprint de Digitalocean]
+}
+cat token.txt
+sudo terraform apply
+ssh root@ipdelamaquinadroplet
+
+Practica3
+
+sudo apt install -y python3
+sudo apt install software-properties-common
+sudo apt install ansibl
+
+sudo apt update && sudo apt install ansible
+ansible --version
+ssh root@digitaloceanip
+adduser ansible1
+usermod -aG sudo ansible1
+rsync --archive --chown=ansible1:ansible1 ~/.ssh /home/ansible1
+
+(Ansible controller)
+sudo mkdir /etc/ansible
+sudo nano /etc/ansible/hosts
+
+(dentro ponemos)
+
+[linux]
+Ip del linux
+
+[linux:vars]
+ansible_user=ansible1
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+ansible_become_password=contrasena
+
+Vamos a windows y dentro ponemos estos comandos:
+Set-ExecutionPolicy RemoteSigned -Force
+Enable-PSRemoting -Force
+Set-Item WSMan:\localhost\Service\Auth\Basic -Value $true
+Set-Item WSMan:\localhost\Service\AllowUnencrypted -Value $true
+Restart-Service WinRM
+Install-Module -Name PSWindowsUpdate -Force
+New-NetFirewallRule -Name "WinRM HTTP" -Protocol TCP -LocalPort 5985 -Action Allow
+New-LocalUser -Name "ansible2" -Password (ConvertTo-SecureString "ansible2" -AsPlainText -Force)
+Add-LocalGroupMember -Group "Administrators" -Member "ansible2"
+winrm create winrm/config/Listener?Address=*+Transport=HTTP
+winrm enumerate winrm/config/listener
+
+(Ansible controller nuevamente)
+sudo nano /etc/ansible/hosts
+
+(Agregamos debajo de nuestra configuración de Linux)
+[windows]
+ip del windows
+
+[windows:vars]
+ansible_user=ansible2
+ansible_password="contrasena"
+ansible_port=5986
+ansible_connection=winrm
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+
+
+ping Linux: ansible linux -m ping
+Ping Linux: ansible windows -m win_ping
+
+Comando extra para el ansible enviroment: 
+
+python3 -m venv ansible-env
+source ansible-env/bin/activate
+
+
+Practica4
+
+Creamos nuestro archivo.txt en Windows
+Luego en ansibel controller ponemos
+
+ansible windows -i /etc/ansible/hosts -m win_copy -a "src=C:/Users/ansible2/Desktop/archivo.txt dest=C:/Users/ansible2/Documents/ remote_src=yes" -vvvv
+
+Luego pasamos al siguiente conectándonos al ssh root@digitalocean para comprobar cuando se reinicie
+
+Para que se reinicie el comando ad hoc es:
+
+ansible linux -i /etc/ansible/hosts -m reboot --become
+
+Luego entramos después del reinicio para ver que todo vaya bien por ssh de nuevo
+
+Practica5
+
+En ansible controller:
+
+sudo nano notepad-install
+Ponemos dentro:
+- name: Descargar e instalar Notepad++
+  hosts: windows
+  tasks:
+    - name: Descargar el instalador de Notepad++
+      win_get_url:
+        url: "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.4.6/npp.8.4.6.Installer.exe"
+        dest: "C:\\Users\\ansible2\\Downloads\\npp_installer.exe"
+    
+    - name: Ejecutar el instalador de Notepad++
+      win_shell: |
+        Start-Process -FilePath "C:\\Users\\ansible2\\Downloads\\npp_installer.exe" -ArgumentList "/S" -Wait
+      args:
+        executable: powershell
+
+lo ejecutamos con ansible-playbook notepad-install
+
+Para el próximo hacemos lo siguiente:
+
+sudo nano linux_reboot
+(ponemos esto dentro)
+
+- name: Actualizar los repositorios del sistema
+  hosts: linux
+  become: yes
+  tasks:
+    - name: Actualizar la lista de paquetes
+      apt:
+        update_cache: yes
+
+lo ejecutamos con:
+
+ansible-playbook linux-reboot
+
+
+
+
+
